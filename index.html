@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhSu Company - Gemini Direct Connection</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+
+    /* Loader va Status */
+    .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
+    .loader-text { font-size: 18px; color: #38bdf8; font-weight: 600; text-align: center; }
+    .spinner { width: 60px; height: 60px; border: 6px solid #334155; border-top: 6px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Kirish Kartasi */
+    .card { background: #1e293b; padding: 25px; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); text-align: center; }
+    h2 { font-size: 20px; margin-bottom: 20px; color: #f1f5f9; }
+    
+    .btn-group { display: flex; flex-direction: column; gap: 12px; }
+    .btn { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
+    .btn:hover { background: #1d4ed8; }
+    .btn:disabled { background: #475569; cursor: not-allowed; opacity: 0.6; }
+
+    .input-group { margin-bottom: 15px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 5px; }
+    .input-group input, .input-group textarea { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 14px; outline: none; }
+    
+    .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; margin: 15px 0; text-align: left; }
+
+    /* Dashboard */
+    .dashboard { width: 100vw; min-height: 100vh; background: #0b1329; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 30px; }
+    .profile-btn { background: #1e293b; border: 1px solid #334155; color: #38bdf8; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 15px; }
+    .header-title { font-size: 24px; color: #f8fafc; font-weight: bold; text-align: center; flex-grow: 1; }
+
+    .dashboard-layout { display: flex; gap: 25px; flex-wrap: wrap; width: 100%; max-width: 1400px; margin: 0 auto; flex: 1; }
+    .left-content { flex: 2; min-width: 320px; display: flex; flex-direction: column; gap: 30px; }
+    .right-content { flex: 1; min-width: 280px; }
+
+    /* Maxsus Imkoniyatlar Bloki */
+    .special-box { background: #1e293b; border: 2px dashed #eab308; border-radius: 12px; padding: 25px; text-align: center; opacity: 0.9; cursor: not-allowed; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; }
+    .badge { background: #eab308; color: #000; font-weight: bold; padding: 6px 14px; border-radius: 20px; font-size: 13px; margin-top: 15px; }
+
+    /* AI Agent & Frame */
+    .ai-agent-box { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .preview-frame { width: 100%; height: 400px; background: white; border-radius: 8px; border: none; margin-top: 15px; }
+
+    /* Saytlar Grid */
+    .section-title { font-size: 20px; color: #38bdf8; margin-bottom: 15px; border-bottom: 2px solid #38bdf8; padding-bottom: 5px; display: inline-block; }
+    .sites-grid { display: flex; flex-wrap: wrap; gap: 15px; }
+    .site-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 15px; flex: 1; min-width: 200px; text-decoration: none; color: white; transition: 0.3s; }
+    .site-card:hover { transform: translateY(-5px); border-color: #38bdf8; }
+
+    /* Modal */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: flex; justify-content: center; align-items: center; z-index: 100; }
+    .modal-content { background: #1e293b; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #334155; }
+    .info-row { text-align: left; margin: 10px 0; font-size: 14px; color: #cbd5e1; background: #0f172a; padding: 10px; border-radius: 6px; }
+    .gmail-option { background: #0f172a; padding: 8px 12px; border-radius: 6px; margin: 6px 0; cursor: pointer; text-align: left; border: 1px solid #334155; font-size: 13px; }
+    .gmail-option.selected { border-color: #38bdf8; background: #1e3a8a; }
+
+    .hidden { display: none !important; }
+    .error-msg { color: #ef4444; font-size: 13px; margin-top: 10px; }
+    .status-msg { color: #eab308; font-size: 13px; margin-top: 8px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- 10s Loader -->
+  <div id="initial-loader" class="loader-container">
+    <div class="loader-text">sayt yaratilyapti kuting !</div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Kirish Kartasi -->
+  <div id="main-card" class="card hidden">
+    <div id="role-selection">
+      <h2>Hurmatli Foydalanuvchi siz qaysi turdansiz?</h2>
+      <div class="btn-group">
+        <button class="btn" onclick="openForm('user')">Oddiy foydalanuvchi</button>
+        <button class="btn" style="background:#0d9488" onclick="openForm('worker')">Company Ishchisi</button>
+      </div>
+    </div>
+
+    <!-- User Forma -->
+    <div id="user-form" class="hidden">
+      <h2>Ro'yxatdan o'tish</h2>
+      <div class="input-group">
+        <label>Ism</label>
+        <input type="text" id="u-fname" oninput="validateUserForm()">
+      </div>
+      <div class="input-group">
+        <label>Familiya</label>
+        <input type="text" id="u-lname" oninput="validateUserForm()">
+      </div>
+      <div class="input-group">
+        <label>Parol (kamida 6 ta belgi)</label>
+        <input type="password" id="u-pass" oninput="validateUserForm()">
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="u-agree" onchange="validateUserForm()">
+        <label for="u-agree">Siz ro'yxatdan o'tmoqchimisiz?</label>
+      </div>
+      <button id="user-submit-btn" class="btn" disabled onclick="submitUserForm()">Bo'ldi</button>
+    </div>
+
+    <!-- Worker Forma -->
+    <div id="worker-form" class="hidden">
+      <h2>Siz GhSu companyaning ishchisi bo'lsangiz sizga berilgan IDni tering</h2>
+      <div class="input-group" style="margin-top: 15px;">
+        <label>ID Raqam</label>
+        <input type="password" id="worker-id" placeholder="ID kiriting">
+      </div>
+      <p id="worker-error" class="error-msg hidden">ID noto'g'ri!</p>
+      <button class="btn" style="margin-top: 10px;" onclick="submitWorkerForm()">Kirish</button>
+    </div>
+
+    <!-- 5s Loader -->
+    <div id="action-loader" class="loader-container hidden">
+      <div class="loader-text">bosh menu yaratilyapti kuting !</div>
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard hidden">
+    <div class="header-top">
+      <button class="profile-btn" onclick="toggleModal('profile-modal', true)">👤 Profil</button>
+      <div class="header-title">GhSu companyasi saytiga Hush kelibsiz</div>
+      <div style="width: 100px;"></div>
+    </div>
+
+    <div class="dashboard-layout">
+      <div class="left-content">
+        <!-- AI Agent -->
+        <div class="ai-agent-box">
+          <h2 style="color: #38bdf8; text-align: left; font-size: 18px; margin-bottom: 10px;">🤖 GhSu AI Agent (Google Gemini Powered)</h2>
+          <div class="input-group">
+            <textarea id="ai-prompt" rows="3" placeholder="Masalan: Kafe uchun zamonaviy va chiroyli sayt yaratib ber..."></textarea>
+          </div>
+          <button id="ai-gen-btn" class="btn" onclick="generateAISiteWithBackend()">AI Yordamida Yaratish</button>
+          <div id="ai-status" class="status-msg hidden">Gemini AI sayt kodini tayyorlamoqda...</div>
+          
+          <iframe id="ai-preview" class="preview-frame hidden"></iframe>
+        </div>
+
+        <!-- Loyihalar -->
+        <div>
+          <h3 class="section-title">GhSu jamosi yaratgan saytlar</h3>
+          <div class="sites-grid">
+            <a href="[https://ghbloxshop.onrender.com](https://ghbloxshop.onrender.com)" target="_blank" class="site-card">
+              <h4>🛒 GhBloxShop</h4>
+              <p style="font-size: 11px; color: #94a3b8;">ghbloxshop.onrender.com</p>
+            </a>
+            <a href="[https://ghaie.onrender.com](https://ghaie.onrender.com)" target="_blank" class="site-card">
+              <h4>🤖 GhAI Engine</h4>
+              <p style="font-size: 11px; color: #94a3b8;">ghaie.onrender.com</p>
+            </a>
+            <a href="[https://ghmek.onrender.com](https://ghmek.onrender.com)" target="_blank" class="site-card">
+              <h4>🛍️ GhMek Market</h4>
+              <p style="font-size: 11px; color: #94a3b8;">ghmek.onrender.com</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maxsus Imkoniyatlar (Faqat Ishchida) -->
+      <div id="worker-special-container" class="right-content hidden">
+        <div class="special-box">
+          <h3 style="color: #facc15; font-size: 20px;">⚡ Maxsus imkoniyatlar</h3>
+          <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Company ishchilar maxsus paneli</p>
+          <span class="badge">TEZ KUNDA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profil Modali -->
+  <div id="profile-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 style="color: #38bdf8; margin-bottom: 15px;">Profil Ma'lumotlari</h3>
+      <div class="info-row"><b>Ism:</b> <span id="prof-fname">-</span></div>
+      <div class="info-row"><b>Familiya:</b> <span id="prof-lname">-</span></div>
+      <div class="info-row"><b>ID:</b> <span id="prof-id" style="color: #38bdf8; font-weight: bold;">-</span></div>
+      
+      <div class="info-row">
+        <b>Gmail:</b> <span id="prof-gmail" style="color: #4ade80;">Tanlanmagan</span>
+        <div style="margin-top: 10px;">
+          <div class="gmail-option" onclick="selectGmail(this, 'user1@gmail.com')">user1@gmail.com</div>
+          <div class="gmail-option" onclick="selectGmail(this, 'ghsu.official@gmail.com')">ghsu.official@gmail.com</div>
+          <div class="gmail-option" onclick="selectGmail(this, 'developer@gmail.com')">developer@gmail.com</div>
+          <button id="gmail-confirm-btn" class="btn" style="padding: 6px; font-size: 12px; margin-top: 5px;" disabled onclick="confirmGmail()">Gmailni Tasdiqlash</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn" style="background: #475569;" onclick="toggleModal('profile-modal', false)">Yopish</button>
+        <button class="btn" style="background: #dc2626;" onclick="logout()">Profildan Chiqish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const initialLoader = document.getElementById('initial-loader');
+    const mainCard = document.getElementById('main-card');
+    const roleSelection = document.getElementById('role-selection');
+    const userForm = document.getElementById('user-form');
+    const workerForm = document.getElementById('worker-form');
+    const actionLoader = document.getElementById('action-loader');
+    const dashboard = document.getElementById('dashboard');
+
+    let selectedTempGmail = "";
+
+    window.onload = () => {
+      const savedState = localStorage.getItem('site_state');
+      if (savedState === 'menu') {
+        initialLoader.classList.add('hidden');
+        showDashboard();
+      } else {
+        setTimeout(() => {
+          initialLoader.classList.add('hidden');
+          mainCard.classList.remove('hidden');
+        }, 10000);
+      }
+    };
+
+    function openForm(role) {
+      roleSelection.classList.add('hidden');
+      if (role === 'user') userForm.classList.remove('hidden');
+      if (role === 'worker') workerForm.classList.remove('hidden');
+    }
+
+    function validateUserForm() {
+      const fname = document.getElementById('u-fname').value.trim();
+      const lname = document.getElementById('u-lname').value.trim();
+      const pass = document.getElementById('u-pass').value;
+      const agree = document.getElementById('u-agree').checked;
+      document.getElementById('user-submit-btn').disabled = !(fname && lname && pass.length >= 6 && agree);
+    }
+
+    function generateRandomID() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = 'Gh-';
+      for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function submitUserForm() {
+      const fname = document.getElementById('u-fname').value.trim();
+      const lname = document.getElementById('u-lname').value.trim();
+      
+      userForm.classList.add('hidden');
+      actionLoader.classList.remove('hidden');
+
+      setTimeout(() => {
+        actionLoader.classList.add('hidden');
+        mainCard.classList.add('hidden');
+        
+        localStorage.setItem('site_state', 'menu');
+        localStorage.setItem('user_role', 'user');
+        localStorage.setItem('fname', fname);
+        localStorage.setItem('lname', lname);
+        localStorage.setItem('user_id', generateRandomID());
+        
+        showDashboard();
+      }, 5000);
+    }
+
+    function submitWorkerForm() {
+      const idInput = document.getElementById('worker-id').value;
+      if (idInput === "7879010") {
+        workerForm.classList.add('hidden');
+        actionLoader.classList.remove('hidden');
+
+        setTimeout(() => {
+          actionLoader.classList.add('hidden');
+          mainCard.classList.add('hidden');
+
+          localStorage.setItem('site_state', 'menu');
+          localStorage.setItem('user_role', 'worker');
+          localStorage.setItem('fname', 'Ishchi');
+          localStorage.setItem('lname', 'GhSu');
+          localStorage.setItem('user_id', 'Gh-787901');
+
+          showDashboard();
+        }, 5000);
+      } else {
+        document.getElementById('worker-error').classList.remove('hidden');
+      }
+    }
+
+    function showDashboard() {
+      dashboard.classList.remove('hidden');
+      const role = localStorage.getItem('user_role');
+      
+      document.getElementById('prof-fname').innerText = localStorage.getItem('fname') || 'Foydalanuvchi';
+      document.getElementById('prof-lname').innerText = localStorage.getItem('lname') || 'Mavjud emas';
+      document.getElementById('prof-id').innerText = localStorage.getItem('user_id') || 'Gh-000000';
+      document.getElementById('prof-gmail').innerText = localStorage.getItem('selected_gmail') || 'Tanlanmagan';
+
+      const workerPanel = document.getElementById('worker-special-container');
+      if (role === 'worker') {
+        workerPanel.classList.remove('hidden');
+      } else {
+        workerPanel.classList.add('hidden');
+      }
+    }
+
+    function toggleModal(id, show) {
+      document.getElementById(id).classList.toggle('hidden', !show);
+    }
+
+    function selectGmail(element, email) {
+      document.querySelectorAll('.gmail-option').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedTempGmail = email;
+      document.getElementById('gmail-confirm-btn').disabled = false;
+    }
+
+    function confirmGmail() {
+      if (selectedTempGmail) {
+        localStorage.setItem('selected_gmail', selectedTempGmail);
+        document.getElementById('prof-gmail').innerText = selectedTempGmail;
+        alert("Gmail muvaffaqiyatli saqlandi!");
+      }
+    }
+
+    /* PYTHON BACKEND BOG'LANIShI (Gemini AI Generator) */
+    async function generateAISiteWithBackend() {
+      const promptText = document.getElementById('ai-prompt').value;
+      const previewFrame = document.getElementById('ai-preview');
+      const statusDiv = document.getElementById('ai-status');
+      const genBtn = document.getElementById('ai-gen-btn');
+
+      if (!promptText.trim()) return;
+
+      statusDiv.classList.remove('hidden');
+      genBtn.disabled = true;
+
+      try {
+        const response = await fetch('http://localhost:5000/generate-site', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          previewFrame.classList.remove('hidden');
+          previewFrame.srcdoc = data.code;
+        } else {
+          alert("Xatolik: " + data.error);
+        }
+      } catch (error) {
+        alert("Python Backend serverga ulanib bo'lmadi! Server ishlayotganini tekshiring.");
+      } finally {
+        statusDiv.classList.add('hidden');
+        genBtn.disabled = false;
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.reload();
+    }
+  </script>
+</body>
+</html>
