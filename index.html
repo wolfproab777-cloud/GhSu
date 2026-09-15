@@ -1,78 +1,750 @@
-from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters import CommandStart, CommandObject
-import asyncio
-
-BOT_TOKEN = "YOUR_BOT_TOKEN" # BotFather'dan olingan token
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
-
-# Saytdan t.me/bot?start=parametr orqali kirganda ishlaydigan xandler
-@dp.message(CommandStart(deep_link=True))
-async def handle_deep_link(message: types.Message, command: CommandObject):
-    args = command.args  # Masalan: "premium_25", "premium_plus_50", "donate_100"
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHSU Company - Rasmiy Veb-Sayti</title>
+    <!-- FontAwesome ikonkalar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    if args.startswith("premium_plus"):
-        await bot.send_invoice(
-            chat_id=message.chat.id,
-            title="Premium Plus Obuna",
-            description="GHSU platformasi uchun Premium Plus tarifi",
-            payload="payload_premium_plus",
-            currency="XTR",
-            prices=[types.LabeledPrice(label="Premium Plus", amount=50)], # 50 Stars
-            need_phone_number=False
-        )
-    elif args.startswith("premium"):
-        await bot.send_invoice(
-            chat_id=message.chat.id,
-            title="Premium Obuna",
-            description="GHSU platformasi uchun Premium tarifi",
-            payload="payload_premium",
-            currency="XTR",
-            prices=[types.LabeledPrice(label="Premium", amount=25)], # 25 Stars
-            need_phone_number=False
-        )
-    elif args.startswith("donate"):
-        # donate_50 ko'rinishidagi parametrdan Stars sonini ajratib olish
-        try:
-            amount = int(args.split("_")[1])
-        except (IndexError, ValueError):
-            amount = 10
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        await bot.send_invoice(
-            chat_id=message.chat.id,
-            title="GHSU Loyihasiga Donat",
-            description=f"Loyiha rivojiga {amount} Stars donat qilish",
-            payload=f"payload_donate_{amount}",
-            currency="XTR",
-            prices=[types.LabeledPrice(label="Donat", amount=amount)],
-            need_phone_number=False
-        )
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
 
-# Oddiy /start bosilganda
-@dp.message(CommandStart())
-async def handle_start(message: types.Message):
-    await message.answer("Xush kelibsiz! GHSU platformasi rasmiy botiga xush kelibsiz.")
+        /* Toast Bildirishnoma */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
 
-# To'lov oldidan tasdiqlash
-@dp.pre_checkout_query()
-async def process_pre_checkout(pre_checkout_query: types.PreCheckoutQuery):
-    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+        .toast {
+            background-color: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out forwards;
+        }
 
-# To'lov muvaffaqiyatli o'tganda
-@dp.message(F.successful_payment)
-async def process_successful_payment(message: types.Message):
-    stars_amount = message.successful_payment.total_amount
-    payload = message.successful_payment.invoice_payload
+        .toast.success { border-color: #22c55e; }
+        .toast.error { border-color: #ef4444; }
 
-    if "premium_plus" in payload:
-        await message.answer("Rahmat! Premium Plus obunangiz muvaffaqiyatli faollashtirildi! ✨")
-    elif "premium" in payload:
-        await message.answer("Rahmat! Premium obunangiz muvaffaqiyatli faollashtirildi! ⭐")
-    else:
-        await message.answer(f"Katta rahmat! Loyihani {stars_amount} Stars bilan qo'llab-quvvatlaganingiz uchun tashakkur! 🚀")
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
-async def main():
-    await dp.start_polling(bot)
+        /* Top Bar */
+        .top-welcome-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            text-align: center;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-if __name__ == "__main__":
-    asyncio.run(main())
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #3b82f6;
+        }
+
+        .logo span {
+            color: #8b5cf6;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #3b82f6;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-avatar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #3b82f6;
+        }
+
+        .profile-icon {
+            font-size: 28px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .profile-icon:hover {
+            color: #3b82f6;
+        }
+
+        /* Tugmalar */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 45vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            padding: 40px 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+        }
+
+        /* Section */
+        .section {
+            padding: 50px 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #f8fafc;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            transition: transform 0.3s, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .card.featured {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            color: #3b82f6;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .price-tag {
+            font-size: 24px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin: 10px 0 15px 0;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .pricing-features li i {
+            color: #22c55e;
+            margin-right: 8px;
+        }
+
+        /* Modallar */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background-color: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            border: 1px solid #334155;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #cbd5e1;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #3b82f6;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar-large {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3b82f6;
+        }
+
+        .stats-box {
+            background-color: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            line-height: 1.8;
+            border: 1px solid #334155;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #1e293b;
+            color: #64748b;
+            border-top: 1px solid #334155;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .hero-content h1 {
+                font-size: 28px;
+            }
+            .nav-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Xabarnomalar joyi -->
+    <div id="toast-container"></div>
+
+    <!-- Yuqori Xush Kelibsiz Satri -->
+    <div class="top-welcome-bar">
+        <span><i class="fa-solid fa-building"></i> Xush kelibsiz GHSU kompaniyasiga!</span>
+    </div>
+
+    <!-- Navigatsiya Menyusi -->
+    <nav class="navbar">
+        <div class="logo">GHSU<span>.</span></div>
+        
+        <ul class="nav-links">
+            <li><a href="#home" class="active">Bosh sahifa</a></li>
+            <li><a href="#sites">Saytlar</a></li>
+            <li><a href="#pricing">Tariflar</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <button id="loginBtn" class="btn btn-outline" onclick="openModal('loginModal')"><i class="fa-solid fa-right-to-bracket"></i> Kirish</button>
+            <button id="registerBtn" class="btn btn-primary" onclick="openModal('registerModal')"><i class="fa-solid fa-user-plus"></i> Ro'yxatdan o'tish</button>
+            <div id="profileNavArea" onclick="openProfile()">
+                <i class="fa-solid fa-circle-user profile-icon" title="Profil"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Bo'limi -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>GHSU Kompaniyasiga Xush Kelibsiz</h1>
+            <p>Biz zamonaviy texnologiyalar va innovatsion raqamli yechimlar platformasimiz.</p>
+            <a href="#sites" class="btn btn-primary">Saytlarni ko'rish</a>
+        </div>
+    </section>
+
+    <!-- Saytlar Bo'limi -->
+    <section id="sites" class="section">
+        <h2 class="section-title">GHSU Saytlari va Loyihalari</h2>
+        <div class="card-grid">
+            <div class="card">
+                <div>
+                    <i class="fa-solid fa-shop card-icon"></i>
+                    <h3>GH Blox Shop</h3>
+                    <p>Onlayn platforma va xizmatlar loyihasi.</p>
+                </div>
+                <a href="https://ghbloxshop.onrender.com" target="_blank" class="btn btn-primary">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+
+            <div class="card">
+                <div>
+                    <i class="fa-solid fa-store card-icon"></i>
+                    <h3>GH Mek Marketplace</h3>
+                    <p>Raqamli mahsulotlar va savdo maydonchasi.</p>
+                </div>
+                <a href="https://ghmek.onrender.com" target="_blank" class="btn btn-primary">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Obuna va Tariflar Bo'limi (Stars Integratsiyasi) -->
+    <section id="pricing" class="section" style="background-color: #0f172a;">
+        <h2 class="section-title">Abonement va Donat (Telegram Stars)</h2>
+        <div class="card-grid">
+            <!-- 1. Bepul Tarif -->
+            <div class="card">
+                <div>
+                    <h3>Bepul (Free)</h3>
+                    <div class="price-tag">0 Stars</div>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> Asosiy xizmatlardan foydalanish</li>
+                        <li><i class="fa-solid fa-check"></i> Ommaviy loyihalarni ko'rish</li>
+                    </ul>
+                </div>
+                <button class="btn btn-outline" onclick="showToast('Siz hozirda Bepul tarifdasiz', 'info')">Aktiv rejim</button>
+            </div>
+
+            <!-- 2. Premium Tarif -->
+            <div class="card featured">
+                <div>
+                    <h3>Premium</h3>
+                    <div class="price-tag">⭐ 25 Stars</div>
+                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">(7 000 so'm ekvivalenti)</p>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> Barcha Bepul imkoniyatlar</li>
+                        <li><i class="fa-solid fa-check"></i> Tezkor qo'llab-quvvatlash</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" onclick="payViaStars('premium', 25)">⭐ Stars bilan to'lash (25)</button>
+            </div>
+
+            <!-- 3. Premium Plus Tarif -->
+            <div class="card featured">
+                <div>
+                    <h3>Premium Plus</h3>
+                    <div class="price-tag">⭐ 50 Stars</div>
+                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">(15 000 so'm ekvivalenti)</p>
+                    <ul class="pricing-features">
+                        <li><i class="fa-solid fa-check"></i> Barcha Premium imkoniyatlar</li>
+                        <li><i class="fa-solid fa-check"></i> VIP darajadagi xizmatlar</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" onclick="payViaStars('premium_plus', 50)">⭐ Stars bilan to'lash (50)</button>
+            </div>
+
+            <!-- 4. Donat qilish -->
+            <div class="card">
+                <div>
+                    <h3>Loyihaga Donat</h3>
+                    <div class="price-tag">⭐ 1 - 1500 Stars</div>
+                    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Kompaniyani rivojlantirish uchun ixtiyoriy miqdorda Stars sovg'a qiling.</p>
+                </div>
+                <button class="btn btn-outline" onclick="openDonateStarsModal()">🎁 Donat qilish</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kirish Modali -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Hisobga kirish</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Gmail</label>
+                    <input type="email" id="loginEmail" placeholder="example@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Parol</label>
+                    <input type="password" id="loginPassword" placeholder="Parolingiz" required>
+                </div>
+                <p id="loginError" class="error-msg">Email yoki parol noto'g'ri!</p>
+                <button type="submit" class="btn btn-primary btn-full">Kirish</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ro'yxatdan o'tish Modali -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Ro'yxatdan o'tish</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label>Ismingiz</label>
+                    <input type="text" id="regName" placeholder="Ismingizni kiriting" required>
+                </div>
+                <div class="input-group">
+                    <label>Gmail</label>
+                    <input type="email" id="regEmail" placeholder="example@gmail.com" required>
+                    <p id="regEmailError" class="error-msg">Email oxiri @gmail.com bilan tugashi shart!</p>
+                </div>
+                <div class="input-group">
+                    <label>Parol (kamida 6 ta belgi)</label>
+                    <input type="password" id="regPassword" placeholder="Parolingiz" required>
+                    <p id="regPassError" class="error-msg">Parol 6 ta belgidan kam bo'lmasligi kerak!</p>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Yaratish</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profil Modali -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('profileModal')">&times;</span>
+            <h2>Profil va Sozlamalar</h2>
+            
+            <div id="profileViewSection">
+                <div class="profile-header">
+                    <img id="profileImageDisplay" src="https://via.placeholder.com/65" class="profile-avatar-large" alt="Avatar">
+                    <div>
+                        <h3 id="profileNameDisplay">Ism</h3>
+                        <p id="profileEmailDisplay" style="font-size: 13px; color: #94a3b8;">Email</p>
+                    </div>
+                </div>
+
+                <div class="stats-box">
+                    <p><strong>Ro'yxatdan o'tilgan vaqt:</strong> <span id="profileJoinedDate">-</span></p>
+                    <p><strong>Abonement:</strong> <span id="userPlanDisplay" style="color: #38bdf8;">Bepul (Free)</span></p>
+                </div>
+
+                <button class="btn btn-outline btn-full" onclick="toggleEditProfile(true)"><i class="fa-solid fa-pen"></i> Profilni tahrirlash</button>
+                <button id="logoutBtn" class="btn btn-danger btn-full" onclick="handleLogout()" style="margin-top: 10px;">Tizimdan chiqish</button>
+            </div>
+
+            <div id="profileEditSection" style="display: none; margin-top: 15px;">
+                <form onsubmit="handleSaveProfile(event)">
+                    <div class="input-group">
+                        <label>Yangi Ism</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Avatar URL (Rasm havolasi)</label>
+                        <input type="url" id="editAvatar" placeholder="https://example.com/rasm.jpg">
+                    </div>
+                    <div class="input-group">
+                        <label>Yangi Parol</label>
+                        <input type="password" id="editPassword" placeholder="O'zgartirmaslik uchun bo'sh qoldiring">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Saqlash</button>
+                    <button type="button" class="btn btn-outline btn-full" onclick="toggleEditProfile(false)">Bekor qilish</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donat Stars Modali -->
+    <div id="donateStarsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('donateStarsModal')">&times;</span>
+            <h2>⭐ Stars Donat qilish</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin: 10px 0;">1 dan 1500 gacha Stars miqdorini kiriting:</p>
+            
+            <div class="input-group">
+                <label>Stars Miqdori</label>
+                <input type="number" id="customStarsInput" min="1" max="1500" value="10">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="submitCustomDonate()">Donatni tasdiqlash</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 GHSU Company. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <script>
+        // TELEGRAM BOT SOZLAMALARI (Bot Username'ni qo'ying)
+        const BOT_USERNAME = "YOUR_BOT_USERNAME"; // Masalan: GhsuCompanyBot
+
+        window.onload = function() {
+            checkAuthStatus();
+        };
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
+
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) { event.target.style.display = 'none'; }
+        }
+
+        // ⭐ Telegram Stars orqali to'lash funksiyasi
+        function payViaStars(planType, starsAmount) {
+            const isLoggedIn = localStorage.getItem('ghsu_isLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                showToast("To'lov qilish uchun avval tizimga kiring!", 'error');
+                openModal('loginModal');
+                return;
+            }
+
+            // Telegram botingizga to'lov parametri bilan yo'naltirish
+            showToast(`Telegram Botga o'tilmoqda: ${starsAmount} Stars`, 'info');
+            setTimeout(() => {
+                window.location.href = `https://t.me/${BOT_USERNAME}?start=${planType}_${starsAmount}`;
+            }, 1000);
+        }
+
+        function openDonateStarsModal() {
+            openModal('donateStarsModal');
+        }
+
+        function submitCustomDonate() {
+            const amount = document.getElementById('customStarsInput').value;
+            if (amount < 1 || amount > 1500) {
+                showToast("Miqdor 1 va 1500 orasida bo'lishi kerak!", 'error');
+                return;
+            }
+            closeModal('donateStarsModal');
+            payViaStars('donate', amount);
+        }
+
+        // Ro'yxatdan o'tish
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            if (!email.endsWith('@gmail.com') || password.length < 6) {
+                showToast("Email yoki parol talabga javob bermaydi!", 'error');
+                return;
+            }
+
+            const user = { name, email, password, plan: 'Bepul (Free)', joinedDate: new Date().toLocaleString() };
+            localStorage.setItem('ghsu_user', JSON.stringify(user));
+            localStorage.setItem('ghsu_isLoggedIn', 'true');
+
+            showToast("Ro'yxatdan o'tdingiz!");
+            closeModal('registerModal');
+            checkAuthStatus();
+        }
+
+        // Kirish
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const savedUser = JSON.parse(localStorage.getItem('ghsu_user'));
+
+            if (savedUser && savedUser.email === email && savedUser.password === password) {
+                localStorage.setItem('ghsu_isLoggedIn', 'true');
+                showToast("Tizimga kirdingiz!");
+                closeModal('loginModal');
+                checkAuthStatus();
+            } else {
+                showToast("Email yoki parol noto'g'ri!", 'error');
+            }
+        }
+
+        function openProfile() {
+            const savedUser = JSON.parse(localStorage.getItem('ghsu_user'));
+            const isLoggedIn = localStorage.getItem('ghsu_isLoggedIn') === 'true';
+
+            if (isLoggedIn && savedUser) {
+                document.getElementById('profileNameDisplay').innerText = savedUser.name;
+                document.getElementById('profileEmailDisplay').innerText = savedUser.email;
+                document.getElementById('profileJoinedDate').innerText = savedUser.joinedDate || '-';
+                document.getElementById('userPlanDisplay').innerText = savedUser.plan || 'Bepul (Free)';
+                openModal('profileModal');
+            } else {
+                openModal('loginModal');
+            }
+        }
+
+        function toggleEditProfile(showEdit) {
+            document.getElementById('profileViewSection').style.display = showEdit ? 'none' : 'block';
+            document.getElementById('profileEditSection').style.display = showEdit ? 'block' : 'none';
+        }
+
+        function handleSaveProfile(event) {
+            event.preventDefault();
+            let savedUser = JSON.parse(localStorage.getItem('ghsu_user'));
+            savedUser.name = document.getElementById('editName').value.trim();
+            localStorage.setItem('ghsu_user', JSON.stringify(savedUser));
+            showToast("Profil yangilandi!");
+            toggleEditProfile(false);
+            openProfile();
+        }
+
+        function handleLogout() {
+            localStorage.setItem('ghsu_isLoggedIn', 'false');
+            showToast("Tizimdan chiqdingiz!", 'error');
+            closeModal('profileModal');
+            checkAuthStatus();
+        }
+
+        function checkAuthStatus() {
+            const isLoggedIn = localStorage.getItem('ghsu_isLoggedIn') === 'true';
+            document.getElementById('loginBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
+            document.getElementById('registerBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
+        }
+    </script>
+</body>
+</html>
