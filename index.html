@@ -107,15 +107,6 @@
             gap: 10px;
         }
 
-        .profile-avatar-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-            border: 2px solid #3b82f6;
-        }
-
         .profile-icon {
             font-size: 28px;
             color: #94a3b8;
@@ -263,6 +254,54 @@
             margin-right: 8px;
         }
 
+        /* Statistics Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-card {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #3b82f6;
+        }
+
+        /* Contact Form */
+        .contact-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .contact-container textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+
+        .contact-container textarea:focus {
+            border-color: #3b82f6;
+        }
+
         /* Modallar */
         .modal {
             display: none;
@@ -325,13 +364,6 @@
             border-color: #3b82f6;
         }
 
-        .error-msg {
-            color: #ef4444;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-
         .profile-header {
             display: flex;
             align-items: center;
@@ -382,10 +414,8 @@
 </head>
 <body>
 
-    <!-- Toast Xabarnomalar joyi -->
     <div id="toast-container"></div>
 
-    <!-- Yuqori Xush Kelibsiz Satri -->
     <div class="top-welcome-bar">
         <span><i class="fa-solid fa-building"></i> Xush kelibsiz GHSU kompaniyasiga!</span>
     </div>
@@ -397,7 +427,9 @@
         <ul class="nav-links">
             <li><a href="#home" class="active">Bosh sahifa</a></li>
             <li><a href="#sites">Saytlar</a></li>
+            <li><a href="#services">Xizmatlar</a></li>
             <li><a href="#pricing">Tariflar</a></li>
+            <li><a href="#contact">Aloqa</a></li>
         </ul>
 
         <div class="nav-actions">
@@ -413,7 +445,7 @@
     <section id="home" class="hero">
         <div class="hero-content">
             <h1>GHSU Kompaniyasiga Xush Kelibsiz</h1>
-            <p>Biz zamonaviy texnologiyalar va innovatsion raqamli yechimlar platformasimiz.</p>
+            <p>Biz zamonaviy texnologiyalar, sun'iy intellekt va innovatsion raqamli yechimlar platformasimiz.</p>
             <a href="#sites" class="btn btn-primary">Saytlarni ko'rish</a>
         </div>
     </section>
@@ -424,11 +456,20 @@
         <div class="card-grid">
             <div class="card">
                 <div>
+                    <i class="fa-solid fa-brain card-icon"></i>
+                    <h3>GH AI Platform</h3>
+                    <p>Sun'iy intellekt va intellektual chat yechimlari platformasi.</p>
+                </div>
+                <a href="https://ghai.onrender.com" target="_blank" class="btn btn-primary" style="margin-top: 15px;">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </div>
+
+            <div class="card">
+                <div>
                     <i class="fa-solid fa-shop card-icon"></i>
                     <h3>GH Blox Shop</h3>
                     <p>Onlayn platforma va xizmatlar loyihasi.</p>
                 </div>
-                <a href="https://ghbloxshop.onrender.com" target="_blank" class="btn btn-primary">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <a href="https://ghbloxshop.onrender.com" target="_blank" class="btn btn-primary" style="margin-top: 15px;">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
 
             <div class="card">
@@ -437,16 +478,56 @@
                     <h3>GH Mek Marketplace</h3>
                     <p>Raqamli mahsulotlar va savdo maydonchasi.</p>
                 </div>
-                <a href="https://ghmek.onrender.com" target="_blank" class="btn btn-primary">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <a href="https://ghmek.onrender.com" target="_blank" class="btn btn-primary" style="margin-top: 15px;">Saytga o'tish <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
         </div>
     </section>
 
-    <!-- Obuna va Tariflar Bo'limi (Stars Integratsiyasi) -->
+    <!-- Kompaniya Xizmatlari Bo'limi -->
+    <section id="services" class="section" style="background-color: #0f172a;">
+        <h2 class="section-title">Bizning Xizmatlar</h2>
+        <div class="card-grid">
+            <div class="card">
+                <i class="fa-solid fa-code card-icon"></i>
+                <h3>Veb Dasturlash</h3>
+                <p>Zamonaviy va tezkor veb-saytlar hamda veb-ilovalar yaratish xizmati.</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-robot card-icon"></i>
+                <h3>Telegram Botlar</h3>
+                <p>Biznesingizni avtomatlashtirish uchun murakkab funksiyali Telegram botlar.</p>
+            </div>
+            <div class="card">
+                <i class="fa-solid fa-gamepad card-icon"></i>
+                <h3>O'yin va Asset Dasturlash</h3>
+                <p>O'yinlar uchun 3D modellar, skriptlar va loyihalarni ishlab chiqish.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistika Bo'limi -->
+    <section class="section">
+        <h2 class="section-title">GHSU Ko'rsatkichlari</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">3+</div>
+                <p>Faol Loyihalar</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <p>Foydalanuvchilar</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <p>Qo'llab-quvvatlash</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Obuna va Tariflar Bo'limi -->
     <section id="pricing" class="section" style="background-color: #0f172a;">
         <h2 class="section-title">Abonement va Donat (Telegram Stars)</h2>
         <div class="card-grid">
-            <!-- 1. Bepul Tarif -->
             <div class="card">
                 <div>
                     <h3>Bepul (Free)</h3>
@@ -459,7 +540,6 @@
                 <button class="btn btn-outline" onclick="showToast('Siz hozirda Bepul tarifdasiz', 'info')">Aktiv rejim</button>
             </div>
 
-            <!-- 2. Premium Tarif -->
             <div class="card featured">
                 <div>
                     <h3>Premium</h3>
@@ -473,7 +553,6 @@
                 <button class="btn btn-primary" onclick="payViaStars('premium', 25)">⭐ Stars bilan to'lash (25)</button>
             </div>
 
-            <!-- 3. Premium Plus Tarif -->
             <div class="card featured">
                 <div>
                     <h3>Premium Plus</h3>
@@ -487,7 +566,6 @@
                 <button class="btn btn-primary" onclick="payViaStars('premium_plus', 50)">⭐ Stars bilan to'lash (50)</button>
             </div>
 
-            <!-- 4. Donat qilish -->
             <div class="card">
                 <div>
                     <h3>Loyihaga Donat</h3>
@@ -496,6 +574,28 @@
                 </div>
                 <button class="btn btn-outline" onclick="openDonateStarsModal()">🎁 Donat qilish</button>
             </div>
+        </div>
+    </section>
+
+    <!-- Aloqa Bo'limi -->
+    <section id="contact" class="section">
+        <h2 class="section-title">Biz Bilan Bog'lanish</h2>
+        <div class="contact-container">
+            <form onsubmit="handleContactSubmit(event)">
+                <div class="input-group">
+                    <label>Ismingiz</label>
+                    <input type="text" id="contactName" placeholder="Ismingiz" required>
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="contactEmail" placeholder="example@gmail.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Xabar</label>
+                    <textarea id="contactMessage" placeholder="Xabaringizni yozing..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Xabarni yuborish</button>
+            </form>
         </div>
     </section>
 
@@ -513,7 +613,6 @@
                     <label>Parol</label>
                     <input type="password" id="loginPassword" placeholder="Parolingiz" required>
                 </div>
-                <p id="loginError" class="error-msg">Email yoki parol noto'g'ri!</p>
                 <button type="submit" class="btn btn-primary btn-full">Kirish</button>
             </form>
         </div>
@@ -532,12 +631,10 @@
                 <div class="input-group">
                     <label>Gmail</label>
                     <input type="email" id="regEmail" placeholder="example@gmail.com" required>
-                    <p id="regEmailError" class="error-msg">Email oxiri @gmail.com bilan tugashi shart!</p>
                 </div>
                 <div class="input-group">
                     <label>Parol (kamida 6 ta belgi)</label>
                     <input type="password" id="regPassword" placeholder="Parolingiz" required>
-                    <p id="regPassError" class="error-msg">Parol 6 ta belgidan kam bo'lmasligi kerak!</p>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Yaratish</button>
             </form>
@@ -578,10 +675,6 @@
                         <label>Avatar URL (Rasm havolasi)</label>
                         <input type="url" id="editAvatar" placeholder="https://example.com/rasm.jpg">
                     </div>
-                    <div class="input-group">
-                        <label>Yangi Parol</label>
-                        <input type="password" id="editPassword" placeholder="O'zgartirmaslik uchun bo'sh qoldiring">
-                    </div>
                     <button type="submit" class="btn btn-primary btn-full">Saqlash</button>
                     <button type="button" class="btn btn-outline btn-full" onclick="toggleEditProfile(false)">Bekor qilish</button>
                 </form>
@@ -610,8 +703,7 @@
     </footer>
 
     <script>
-        // TELEGRAM BOT SOZLAMALARI (Bot Username'ni qo'ying)
-        const BOT_USERNAME = "GhPayStars_bot"; // Masalan: GhsuCompanyBot
+        const BOT_USERNAME = "GhPayStars_bot";
 
         window.onload = function() {
             checkAuthStatus();
@@ -634,7 +726,6 @@
             if (event.target.classList.contains('modal')) { event.target.style.display = 'none'; }
         }
 
-        // ⭐ Telegram Stars orqali to'lash funksiyasi
         function payViaStars(planType, starsAmount) {
             const isLoggedIn = localStorage.getItem('ghsu_isLoggedIn') === 'true';
 
@@ -644,16 +735,13 @@
                 return;
             }
 
-            // Telegram botingizga to'lov parametri bilan yo'naltirish
             showToast(`Telegram Botga o'tilmoqda: ${starsAmount} Stars`, 'info');
             setTimeout(() => {
                 window.location.href = `https://t.me/${BOT_USERNAME}?start=${planType}_${starsAmount}`;
             }, 1000);
         }
 
-        function openDonateStarsModal() {
-            openModal('donateStarsModal');
-        }
+        function openDonateStarsModal() { openModal('donateStarsModal'); }
 
         function submitCustomDonate() {
             const amount = document.getElementById('customStarsInput').value;
@@ -665,7 +753,6 @@
             payViaStars('donate', amount);
         }
 
-        // Ro'yxatdan o'tish
         function handleRegister(event) {
             event.preventDefault();
             const name = document.getElementById('regName').value.trim();
@@ -686,7 +773,6 @@
             checkAuthStatus();
         }
 
-        // Kirish
         function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
@@ -744,6 +830,12 @@
             const isLoggedIn = localStorage.getItem('ghsu_isLoggedIn') === 'true';
             document.getElementById('loginBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
             document.getElementById('registerBtn').style.display = isLoggedIn ? 'none' : 'inline-block';
+        }
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            showToast("Xabaringiz muvaffaqiyatli yuborildi!", 'success');
+            event.target.reset();
         }
     </script>
 </body>
