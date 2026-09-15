@@ -1,15 +1,22 @@
+import os
+import asyncio
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import CommandStart, CommandObject
-import asyncio
+import uvicorn
 
-BOT_TOKEN = "YOUR_BOT_TOKEN" # BotFather'dan olingan token
+# 1. FastAPI Web Server va Bot sozlamalari
+app = FastAPI()
+BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Saytdan t.me/bot?start=parametr orqali kirganda ishlaydigan xandler
+# 2. Telegram Bot logikasi (Deep Linking va Stars Payment)
 @dp.message(CommandStart(deep_link=True))
 async def handle_deep_link(message: types.Message, command: CommandObject):
-    args = command.args  # Masalan: "premium_25", "premium_plus_50", "donate_100"
+    args = command.args
     
     if args.startswith("premium_plus"):
         await bot.send_invoice(
@@ -18,7 +25,7 @@ async def handle_deep_link(message: types.Message, command: CommandObject):
             description="GHSU platformasi uchun Premium Plus tarifi",
             payload="payload_premium_plus",
             currency="XTR",
-            prices=[types.LabeledPrice(label="Premium Plus", amount=50)], # 50 Stars
+            prices=[types.LabeledPrice(label="Premium Plus", amount=50)],
             need_phone_number=False
         )
     elif args.startswith("premium"):
@@ -28,11 +35,10 @@ async def handle_deep_link(message: types.Message, command: CommandObject):
             description="GHSU platformasi uchun Premium tarifi",
             payload="payload_premium",
             currency="XTR",
-            prices=[types.LabeledPrice(label="Premium", amount=25)], # 25 Stars
+            prices=[types.LabeledPrice(label="Premium", amount=25)],
             need_phone_number=False
         )
     elif args.startswith("donate"):
-        # donate_50 ko'rinishidagi parametrdan Stars sonini ajratib olish
         try:
             amount = int(args.split("_")[1])
         except (IndexError, ValueError):
@@ -48,31 +54,36 @@ async def handle_deep_link(message: types.Message, command: CommandObject):
             need_phone_number=False
         )
 
-# Oddiy /start bosilganda
 @dp.message(CommandStart())
 async def handle_start(message: types.Message):
     await message.answer("Xush kelibsiz! GHSU platformasi rasmiy botiga xush kelibsiz.")
 
-# To'lov oldidan tasdiqlash
 @dp.pre_checkout_query()
 async def process_pre_checkout(pre_checkout_query: types.PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
-# To'lov muvaffaqiyatli o'tganda
 @dp.message(F.successful_payment)
 async def process_successful_payment(message: types.Message):
     stars_amount = message.successful_payment.total_amount
     payload = message.successful_payment.invoice_payload
 
     if "premium_plus" in payload:
-        await message.answer("Rahmat! Premium Plus obunangiz muvaffaqiyatli faollashtirildi! ✨")
+        await message.answer("Rahmat! Premium Plus obunangiz faollashtirildi! ✨")
     elif "premium" in payload:
-        await message.answer("Rahmat! Premium obunangiz muvaffaqiyatli faollashtirildi! ⭐")
+        await message.answer("Rahmat! Premium obunangiz faollashtirildi! ⭐")
     else:
         await message.answer(f"Katta rahmat! Loyihani {stars_amount} Stars bilan qo'llab-quvvatlaganingiz uchun tashakkur! 🚀")
 
-async def main():
-    await dp.start_polling(bot)
+# 3. HTML Saytni ko'rsatish (Web Route)
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+# 4. Server va Botni bir vaqtda ishga tushirish (Lifespan)
+@app.on_event("startup")
+async def on_startup():
+    asyncio.create_task(dp.start_polling(bot))
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    uvicorn.run("main:app", host="0.0.0.0", port=10000)
